@@ -1,0 +1,137 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>오더 목록 빈 공간 비교</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&display=swap">
+<style>
+/* 레이아웃: 실제 오더 목록 화면 그대로 · 위에 지금/개선 비교 토글 */
+:root{
+  --bg:#F3F5F7; --card:#FFFFFF; --tint:#F7F8FA; --line:#E4E7EC; --line2:#EEF0F3; --ink:#1D2433; --sub:#5A6475; --mute:#99A1AD;
+  --navy:#1B2A55; --navy-t:#EDF0F8; --green:#22A447; --blue:#2F6FE0; --blue-t:#E9F0FD; --gr-t:#E7F6EC; --red:#D24343; --red-t:#FDEEEE;
+  --f:'Noto Sans KR',system-ui,-apple-system,'Malgun Gothic',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11151C;--card:#191E28;--tint:#1F2531;--line:#2A303C;--line2:#232935;--ink:#E7EAF0;--sub:#A9B1BE;--mute:#7A8392;--navy:#9DB0EA;--navy-t:#232C42;--blue-t:#1F2C47;--gr-t:#1C3326;--red-t:#3A2222;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151C;--card:#191E28;--tint:#1F2531;--line:#2A303C;--line2:#232935;--ink:#E7EAF0;--sub:#A9B1BE;--mute:#7A8392;--navy:#9DB0EA;--navy-t:#232C42;--blue-t:#1F2C47;--gr-t:#1C3326;--red-t:#3A2222;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:13px;-webkit-font-smoothing:antialiased}
+button,select{font:inherit;color:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+.cmp{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding-block:14px 4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px}
+.seg button{border:none;background:transparent;padding:8px 16px;border-radius:9px;color:var(--sub)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff;font-weight:500}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#11151C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#11151C}}
+.desc{text-align:center;color:var(--sub);font-size:12.5px;margin:4px 16px 10px}
+
+.app{max-width:1500px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:24px}
+.top{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:12px 12px 0 0;padding:12px 18px;flex-wrap:wrap}
+.top h1{margin:0;font-size:19px;font-weight:600}
+.top h1 span{color:var(--sub);font-weight:500}
+.bt{display:inline-flex;gap:2px;background:var(--tint);border:1px solid var(--line);border-radius:10px;padding:3px}
+.bt button{border:none;background:transparent;padding:6px 12px;border-radius:7px;color:var(--sub);font-weight:500}
+.bt button b{font-weight:400;color:var(--mute);margin-left:4px;font-size:12px}
+.bt button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.body{background:var(--bg);border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
+.tool{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.chip{height:28px;padding:0 10px;border-radius:7px;border:1px solid var(--line);background:var(--card);font-size:12px;color:var(--sub);display:inline-flex;align-items:center}
+.chip.on{background:var(--gr-t);border-color:transparent;color:var(--green)}
+.chip.cx{color:var(--red);border-color:color-mix(in srgb,var(--red) 30%,var(--line));background:var(--red-t)}
+.tool .sp{flex:1}
+.ctl{height:30px;padding:0 10px;border-radius:7px;border:1px solid var(--line);background:var(--card);font-size:12px;color:var(--sub);display:inline-flex;align-items:center}
+.ctl.w{width:200px}
+
+/* 표 상자 */
+.tbox{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.tbox.fixed{height:600px}
+.tbox.auto{max-height:600px}
+.tw{overflow:auto;flex:1 1 auto;min-height:0}
+table{width:100%;border-collapse:collapse;min-width:1200px;font-size:inherit}
+th{position:sticky;top:0;z-index:1;background:var(--tint);color:var(--sub);font-weight:400;font-size:12.5px;padding:12px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:13px 8px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line2)}
+tbody tr:not(.endnote) td{border-bottom:1px solid var(--line)}
+td.ad{text-align:left;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+td.no{font-weight:600}
+th:first-child,td:first-child{width:46px}
+.cb{width:14px;height:14px;border:1.5px solid #9AA2AF;border-radius:3px;display:inline-block;vertical-align:middle}
+.st{display:inline-block;font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--sub);background:var(--card)}
+.st.done{color:var(--blue);background:var(--blue-t);border-color:transparent}
+.st.rx{color:var(--green);background:var(--gr-t);border-color:transparent}
+.dash{color:var(--mute)}
+
+/* 개선: 꼬리 줄 + 끝 안내 */
+.foot{flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:10px 16px;border-top:1px solid var(--line);background:var(--tint);font-size:12.5px;color:var(--sub)}
+.foot b{color:var(--ink);font-weight:500}
+.foot .pg{margin-left:auto;display:flex;align-items:center;gap:6px}
+.foot .pg button{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--sub)}
+.foot .pg button:disabled{opacity:.4;cursor:default}
+.endnote td{padding:16px 8px;color:var(--mute);font-size:12px;border-bottom:none;background:var(--card)}
+</style>
+
+<div class="cmp">
+  <div class="seg" role="group" aria-label="비교">
+    <button type="button" data-m="fixed" aria-pressed="false">A · 고정 높이 + 꼬리 줄</button>
+    <button type="button" data-m="auto" aria-pressed="true">B · 내용 높이 + 꼬리 줄</button>
+  </div>
+</div>
+<p class="desc" id="desc"></p>
+
+<div class="app">
+  <header class="top">
+    <h1><span>YS 설치 ›</span> 오더 목록</h1>
+    <div class="bt" id="bt" role="group" aria-label="판매처"></div>
+  </header>
+  <div class="body">
+    <div class="tool">
+      <span class="chip on" id="cAll"></span><span class="chip">미배정</span><span class="chip">기사배정</span><span class="chip">설치진행</span><span class="chip cx">설치취소</span>
+      <span class="sp"></span>
+      <span class="ctl w">검색</span><span class="ctl">연도-월-일 ~ 연도-월-일</span><span class="ctl">기간</span><span class="ctl">상세필터</span><span class="ctl" id="xl"></span>
+    </div>
+    <div class="tbox auto" id="tbox">
+      <div class="tw"><table>
+        <thead><tr><th><span class="cb"></span></th><th>오더번호</th><th>접수일</th><th>판매처</th><th>판매처 지점</th><th>고객명</th><th>전화번호</th><th>주소</th><th>제품</th><th>설치일</th><th>설치지점</th><th>상태</th><th>앱읽음</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table></div>
+      <div class="foot" id="foot"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // 예시 데이터 (가상 고객)
+  var NM = ['김하늘','이서준','박지우','최민서','정예준','강서연','조하준','윤지아','장도윤','임수아','한시우','오지호','서유나','신현우','권다은','황준서','안소율','송하린'];
+  var AD = ['서울 서초구 반포대로 20','서울 강동구 천호대로 415','경기 하남시 미사대로 220','서울 서초구 사평대로 251','대구 수성구 동대구로 25','경기 남양주시 와부읍 덕소로 97','서울 강남구 테헤란로 317','경남 진주시 진주대로 119','서울 강남구 압구정로 77','대구 북구 동천로 24','인천 서해구 청라대로 166','서울 강서구 마곡중앙로 175','서울 강서구 공항대로 58','서울 영등포구 문래로 14','경기 수원시 권선구 세화로 12'];
+  var ROWS = [];
+  for (var i = 0; i < 15; i++){
+    var hli = i < 9, lf = i === 9;
+    ROWS.push({ no:'YS-H-2610-0' + (150 - i * 3), d:'26-10-' + String(19 - i).padStart(2, '0'), s: hli ? 'HLI(와인셀러)' : lf ? 'LF푸드' : '더정진', b: hli ? 'HLI' : lf ? '—' : '단일지점',
+      nm: NM[i], ph:'010-' + (2100 + i * 377) + '-' + (4400 + i * 211), ad: lf ? '미상' : AD[i % AD.length] + (i % 3 ? ' 103동' : ''), pr: hli ? (i % 3 ? '와인쿨러 12구' : '와인쿨러 24구(우측 손잡이)') : lf ? '일반상담' : '[보상판매] 설치서비스',
+      dt: i < 2 || lf ? '' : '26-10-' + String(23 - i).padStart(2, '0'), sj: i < 2 || lf ? '미배정' : ['YS화성/장명희','YS노원/유재승','YS노원/공동진','YS화성/한재민'][i % 4], st: i < 2 || lf ? '' : i === 2 ? 'rx' : 'done' });
+  }
+  var BT = [['lf','LF푸드','LF푸드']];
+  var S = { m:'auto', b:'lf' };
+  var DESC = { fixed:'표 상자 높이는 지금처럼 고정 · 맨 아래에 건수·페이지 꼬리 줄만 붙였어요',
+               auto:'상자는 내용만큼만 내려오고 맨 아래에 건수·페이지 꼬리 줄 · 데이터가 많으면 그때만 안에서 스크롤' };
+  var $ = function(id){ return document.getElementById(id); };
+  function list(){ var f = BT.filter(function(b){ return b[0] === S.b; })[0][2]; return ROWS.filter(function(r){ return !f || r.s === f; }); }
+  function render(){
+    var L = list();
+    Array.prototype.forEach.call(document.querySelectorAll('.seg button'), function(b){ b.setAttribute('aria-pressed', b.dataset.m === S.m); });
+    $('desc').textContent = DESC[S.m];
+    $('bt').innerHTML = BT.map(function(b){ var n = b[2] ? ROWS.filter(function(r){ return r.s === b[2]; }).length : ROWS.length; return '<button type="button" data-b="' + b[0] + '" aria-pressed="' + (S.b === b[0]) + '">' + b[1] + '<b class="num">' + n + '</b></button>'; }).join('');
+    Array.prototype.forEach.call($('bt').querySelectorAll('button'), function(b){ b.onclick = function(){ S.b = b.dataset.b; render(); }; });
+    $('cAll').textContent = '전체 ' + L.length; $('xl').textContent = L.length + '건 엑셀';
+    $('tbox').className = 'tbox ' + S.m;
+    var h = L.map(function(r){
+      return '<tr><td><span class="cb"></span></td><td class="no num">' + r.no + '</td><td class="num">' + r.d + '</td><td>' + r.s + '</td><td>' + r.b + '</td><td>' + r.nm + '</td><td class="num">' + r.ph + '</td><td class="ad">' + r.ad + '</td><td>' + r.pr + '</td><td class="num">' + (r.dt || '<span class="dash">—</span>') + '</td><td>' + r.sj + '</td><td>' + (r.st ? '<span class="st ' + r.st + '">' + (r.st === 'rx' ? '수락완료' : '설치완료') + '</span>' : '<span class="st">미배정</span>') + '</td><td>' + (r.st ? '<span class="st rx">수락</span>' : '<span class="dash">—</span>') + '</td></tr>';
+    }).join('');
+    if (L.length && L.length < 15) h += '<tr class="endnote"><td colspan="13">조회된 마지막 오더입니다.</td></tr>';
+    $('tb').innerHTML = h;
+    $('foot').hidden = false;
+    $('foot').innerHTML = '<span><b class="num">' + L.length + '건</b> 중 1–' + L.length + '</span><span>15개씩 보기</span><span class="pg"><button type="button" disabled aria-label="이전">‹</button><span class="num">1 / 1</span><button type="button" disabled aria-label="다음">›</button></span>';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.seg button'), function(b){ b.onclick = function(){ S.m = b.dataset.m; render(); }; });
+  render();
+})();
+</script>
+<script>(function(){var h=location.hash.slice(1);if(!h)return;var b=document.querySelector('[data-m="'+h+'"],[data-v="'+h+'"]');if(b)b.click();document.addEventListener('click',function(){},true);})();</script></body></html>

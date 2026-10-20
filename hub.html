@@ -1,0 +1,229 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>업무 통합 허브</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap">
+<style>
+/* 레이아웃: 기존 허브 그대로 · 큰 카드 2장은 평소엔 로고만, 올리면 메뉴 3개가 피어나듯 등장 */
+:root{
+  --bg:#F3F5F4; --card:#FFFFFF; --line:#E3E7EA; --ink:#1D2433; --sub:#5A6475; --mute:#99A1AD;
+  --ys:#1F2D5C; --ys-g:#2DB34A; --ys-t:#EEF1F8;
+  --ck:#3F4146; --ck-t:#F1F2F3;
+  --f:'Noto Sans KR',system-ui,-apple-system,'Malgun Gothic',sans-serif;
+  --logo:'Montserrat','Noto Sans KR',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11151C;--card:#191E28;--line:#2A303C;--ink:#E7EAF0;--sub:#A9B1BE;--mute:#7A8392;--ys:#9DB0EA;--ys-t:#232C42;--ck:#C9CCD2;--ck-t:#252B36;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151C;--card:#191E28;--line:#2A303C;--ink:#E7EAF0;--sub:#A9B1BE;--mute:#7A8392;--ys:#9DB0EA;--ys-t:#232C42;--ck:#C9CCD2;--ck-t:#252B36;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;min-height:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--ys);outline-offset:3px}
+
+.wrap{max-width:980px;margin:0 auto;padding-block:56px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px;position:relative}
+.wrap::before{content:"";position:absolute;left:50%;top:-40px;width:620px;max-width:100%;height:360px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(45,179,74,.10),transparent);pointer-events:none}
+.head{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:22px;position:relative}
+.wm{font-family:var(--logo);font-weight:800;letter-spacing:-.02em;color:var(--ys);display:inline-flex;align-items:baseline;gap:6px}
+.wm small{font-family:var(--f);font-weight:400;font-size:.42em;color:var(--sub)}
+.wm .y{color:var(--ys-g)}
+.head .wm{font-size:40px}
+.head p{margin:0;color:var(--sub);letter-spacing:.5em;font-size:15px;padding-left:.5em}
+
+/* 큰 카드 2장 */
+.brands{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:720px){.brands{grid-template-columns:1fr}}
+.bc{--ac:var(--ys);--act:var(--ys-t);position:relative;height:216px;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:0 1px 2px rgba(16,24,40,.04);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;outline:none;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
+.bc.ck{--ac:var(--ck);--act:var(--ck-t)}
+.bc::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 0%,var(--act),transparent 70%);opacity:0;transition:opacity .35s}
+.bc .logo{position:relative;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.logo .wm{font-size:34px}
+.logo .ckw{font-family:var(--logo);font-weight:700;font-size:36px;letter-spacing:.06em;color:var(--ck)}
+.hint{position:absolute;bottom:22px;left:0;right:0;text-align:center;font-size:12px;color:var(--mute);letter-spacing:.06em;transition:opacity .25s,transform .25s}
+.hint i{display:inline-block;width:18px;height:1px;background:currentColor;vertical-align:middle;margin:0 8px;opacity:.6}
+.bc .rule{position:absolute;left:50%;top:52%;width:0;height:1px;background:var(--line);transform:translateX(-50%);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.bc .menu{position:absolute;left:24px;right:24px;bottom:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bc .menu button{height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink);opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .3s,transform .4s cubic-bezier(.2,.8,.2,1),background .2s,border-color .2s,color .2s}
+.bc .menu button svg{color:var(--ac);opacity:.85;transition:color .2s}
+.bc .menu button:hover,.bc .menu button:focus-visible{background:var(--ac);border-color:var(--ac);color:#fff}
+.bc .menu button:hover svg,.bc .menu button:focus-visible svg{color:#fff}
+:root[data-theme="dark"] .bc .menu button:hover,:root[data-theme="dark"] .bc .menu button:focus-visible{color:#11151C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bc .menu button:hover,:root:not([data-theme="light"]) .bc .menu button:focus-visible{color:#11151C}}
+
+/* 열린 상태: 마우스 올림 · 키보드 포커스 · 탭 */
+.bc:hover,.bc:focus-within,.bc.open{transform:translateY(-4px);border-color:color-mix(in srgb,var(--ac) 30%,var(--line));box-shadow:0 18px 40px rgba(16,24,40,.10)}
+.bc:hover::before,.bc:focus-within::before,.bc.open::before{opacity:1}
+.bc:hover .logo,.bc:focus-within .logo,.bc.open .logo{transform:translateY(-44px) scale(.82)}
+.bc:hover .rule,.bc:focus-within .rule,.bc.open .rule{width:calc(100% - 48px)}
+.bc:hover .hint,.bc:focus-within .hint,.bc.open .hint{opacity:0;transform:translateY(8px)}
+.bc:hover .menu button,.bc:focus-within .menu button,.bc.open .menu button{opacity:1;transform:none;pointer-events:auto}
+.bc:hover .menu button:nth-child(2),.bc:focus-within .menu button:nth-child(2),.bc.open .menu button:nth-child(2){transition-delay:.05s,.05s,0s,0s,0s}
+.bc:hover .menu button:nth-child(3),.bc:focus-within .menu button:nth-child(3),.bc.open .menu button:nth-child(3){transition-delay:.1s,.1s,0s,0s,0s}
+/* 터치 화면은 처음부터 펼친 상태 */
+@media (hover:none){.bc .logo{transform:translateY(-44px) scale(.82)}.bc .rule{width:calc(100% - 48px)}.bc .hint{display:none}.bc .menu button{opacity:1;transform:none;pointer-events:auto}}
+@media (prefers-reduced-motion: reduce){.bc,.bc *,.bc::before{transition:none!important}}
+
+/* 아래 작은 카드 4장 */
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+@media (max-width:720px){.tools{grid-template-columns:1fr 1fr}}
+.tc{height:132px;border-radius:16px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-size:14.5px;font-weight:500;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.tc:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(16,24,40,.08)}
+.tc .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center}
+.note{text-align:center;font-size:12.5px;color:var(--mute);margin-top:6px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:10px;font-size:13px;z-index:9}
+
+/* ===== 시안 전환 ===== */
+.vseg{align-self:center;display:inline-flex;flex-wrap:wrap;justify-content:center;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-top:-8px}
+.vseg button{border:none;background:transparent;padding:7px 14px;border-radius:9px;color:var(--sub);font-size:12.5px}
+.vseg button[aria-pressed="true"]{background:var(--ys);color:#fff;font-weight:500}
+:root[data-theme="dark"] .vseg button[aria-pressed="true"]{color:#11151C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .vseg button[aria-pressed="true"]{color:#11151C}}
+.vdesc{margin:-6px 0 4px;text-align:center;font-size:12.5px;color:var(--sub)}
+
+/* ===== D · 옆으로 넓어짐 ===== */
+.brands.wide{display:flex;gap:18px}
+.wide .wc{flex:1 1 0;min-width:0;height:216px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:0;overflow:hidden;outline:none;transition:flex-grow .5s cubic-bezier(.2,.8,.2,1),box-shadow .4s,gap .4s;position:relative}
+.wide .wc .logo{flex:0 0 auto;transition:transform .5s}
+.wide .wc .side{display:flex;flex-direction:column;gap:8px;width:0;opacity:0;overflow:hidden;transition:width .5s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.wide .wc .side button{display:flex;align-items:center;gap:10px;height:42px;padding:0 16px;border-radius:11px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:500;white-space:nowrap;text-align:left}
+.wide .wc .side button svg{color:var(--ac)}
+.wide .wc .side button:hover,.wide .wc .side button:focus-visible{background:var(--ac);border-color:var(--ac);color:#fff}
+.wide .wc .side button:hover svg,.wide .wc .side button:focus-visible svg{color:#fff}
+.wide .wc.ys{--ac:var(--ys)} .wide .wc.ck{--ac:var(--ck)}
+.wide .wc:hover,.wide .wc:focus-within,.wide .wc.open{flex-grow:1.9;gap:36px;box-shadow:0 18px 40px rgba(16,24,40,.10)}
+.wide .wc:hover .side,.wide .wc:focus-within .side,.wide .wc.open .side{width:170px;opacity:1}
+.wide .wc .vline{width:1px;height:0;background:var(--line);transition:height .5s}
+.wide .wc:hover .vline,.wide .wc:focus-within .vline,.wide .wc.open .vline{height:140px}
+@media (max-width:720px){.brands.wide{flex-direction:column}}
+@media (hover:none){.wide .wc{gap:28px}.wide .wc .side{width:150px;opacity:1}.wide .wc .vline{height:120px}}
+@media (prefers-reduced-motion: reduce){.flip .in,.cover .pane,.cover *, .wide .wc,.wide .wc *{transition:none!important}}
+
+/* ===== A-1 · 화이트 라인: 상자 없는 글자 메뉴 + 밑줄 ===== */
+.bc.lnk{background:linear-gradient(180deg,var(--card),color-mix(in srgb,var(--card) 92%,var(--act)))}
+.bc.lnk .rule{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--ac) 35%,var(--line)),transparent)}
+.bc.lnk .menu{left:0;right:0;bottom:34px;display:flex;justify-content:center;gap:0}
+.bc.lnk .menu button{height:36px;padding:0 24px;border:none;border-radius:0;background:transparent;font-size:14.5px;font-weight:500;letter-spacing:.01em;position:relative;color:var(--sub)}
+.bc.lnk .menu button + button::before{content:"";position:absolute;left:0;top:11px;bottom:11px;width:1px;background:var(--line)}
+.bc.lnk .menu button::after{content:"";position:absolute;left:50%;right:50%;bottom:2px;height:1.5px;background:var(--ac);transition:left .3s,right .3s}
+.bc.lnk .menu button:hover,.bc.lnk .menu button:focus-visible{background:transparent;color:var(--ink)}
+.bc.lnk .menu button:hover svg,.bc.lnk .menu button:focus-visible svg{color:var(--ac)}
+.bc.lnk .menu button:hover::after,.bc.lnk .menu button:focus-visible::after{left:24px;right:24px}
+:root[data-theme="dark"] .bc.lnk .menu button:hover{color:var(--ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bc.lnk .menu button:hover{color:var(--ink)}}
+
+/* ===== A-2 · 소프트 글래스 (기존 색 그대로) ===== */
+.bc.lux{background:linear-gradient(180deg,var(--card),color-mix(in srgb,var(--card) 96%,var(--ink)))}
+.bc.lux::before{background:radial-gradient(90% 70% at 50% 0%,var(--card),transparent 70%)}
+.bc.lux::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:38%;background:linear-gradient(100deg,transparent,rgba(31,45,92,.05),transparent);transform:skewX(-18deg);transition:left .9s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.bc.lux:hover::after,.bc.lux:focus-within::after,.bc.lux.open::after{left:130%}
+.bc.lux .rule{background:linear-gradient(90deg,transparent,var(--line),transparent)}
+.bc.lux .menu button{border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.bc.lux .menu button svg{color:var(--mute)}
+.bc.lux .menu button:hover,.bc.lux .menu button:focus-visible{background:var(--act);border-color:color-mix(in srgb,var(--ac) 25%,var(--line));color:var(--ac)}
+.bc.lux .menu button:hover svg,.bc.lux .menu button:focus-visible svg{color:var(--ac)}
+.bc.lux:hover,.bc.lux:focus-within,.bc.lux.open{box-shadow:0 20px 44px rgba(16,24,40,.10),0 2px 6px rgba(16,24,40,.04)}
+
+/* ===== D-1 · 화이트 리스트 ===== */
+.wide .wc.lst .side{gap:0;transition:width .5s cubic-bezier(.2,.8,.2,1),opacity .35s .1s}
+.wide .wc.lst .side button{height:46px;border:none;border-bottom:1px solid var(--line);border-radius:0;background:transparent;padding:0 4px;font-size:14.5px;justify-content:flex-start;width:100%}
+.wide .wc.lst .side button:last-child{border-bottom:none}
+.wide .wc.lst .side button .ar{margin-left:auto;color:var(--mute);transition:transform .25s,color .25s}
+.wide .wc.lst .side button:hover,.wide .wc.lst .side button:focus-visible{background:transparent;color:var(--ac)}
+.wide .wc.lst .side button:hover svg,.wide .wc.lst .side button:focus-visible svg{color:var(--ac)}
+.wide .wc.lst .side button:hover .ar,.wide .wc.lst .side button:focus-visible .ar{transform:translateX(4px);color:var(--ac)}
+.wide .wc.lst:hover .side,.wide .wc.lst:focus-within .side,.wide .wc.lst.open .side{width:190px}
+.wide .wc.lst .vline{background:linear-gradient(180deg,transparent,var(--line),transparent)}
+.wide .wc.lst::before{content:"";position:absolute;inset:0;background:radial-gradient(70% 90% at 0% 50%,var(--act),transparent 70%);opacity:0;transition:opacity .4s;pointer-events:none}
+.wide .wc.lst:hover::before,.wide .wc.lst:focus-within::before,.wide .wc.lst.open::before{opacity:1}
+.wide .wc.ys{--act:var(--ys-t)} .wide .wc.ck{--act:var(--ck-t)}
+.wide .wc .logo,.wide .wc .side,.wide .wc .vline{position:relative;z-index:1}
+
+/* ===== D-2 · 컬러 패널 ===== */
+.wide .wc.pnl{justify-content:flex-start;gap:0}
+.wide .wc.pnl .logo{flex:1 1 auto;display:flex;justify-content:center;transition:transform .5s}
+.wide .wc.pnl .vline{display:none}
+.wide .wc.pnl .side{align-self:stretch;justify-content:center;gap:4px;padding:0;width:0;background:var(--pb);transition:width .55s cubic-bezier(.2,.8,.2,1),padding .55s,opacity .3s}
+.wide .wc.pnl{--pb:color-mix(in srgb,var(--card) 96%,var(--ink))}
+.wide .wc.pnl .side .cap{font-family:var(--logo);font-size:11px;letter-spacing:.2em;color:var(--mute);padding:0 14px 6px;white-space:nowrap}
+.wide .wc.pnl .side button{border:none;background:transparent;color:var(--ink);height:44px;border-radius:10px;padding:0 14px}
+.wide .wc.pnl .side button svg{color:var(--mute)}
+.wide .wc.pnl .side button .ar{margin-left:auto;opacity:0;transform:translateX(-4px);transition:opacity .2s,transform .2s}
+.wide .wc.pnl .side button:hover,.wide .wc.pnl .side button:focus-visible{background:var(--card);border-color:transparent;color:var(--ac);box-shadow:0 1px 3px rgba(16,24,40,.08)}
+.wide .wc.pnl .side button:hover svg{color:var(--ac)}
+.wide .wc.pnl .side button:hover .ar,.wide .wc.pnl .side button:focus-visible .ar{opacity:1;transform:none}
+.wide .wc.pnl:hover,.wide .wc.pnl:focus-within,.wide .wc.pnl.open{gap:0}
+.wide .wc.pnl:hover .side,.wide .wc.pnl:focus-within .side,.wide .wc.pnl.open .side{width:46%;padding:0 18px;border-left:1px solid var(--line)}
+@media (hover:none){.wide .wc.lst .side{width:170px}.wide .wc.pnl .side{width:46%;padding:0 14px}}
+</style>
+
+<main class="wrap">
+  <header class="head">
+    <span class="wm"><small>(주)</small><span><span class="y">Y</span>S COMPANY</span></span>
+    <p>업무 통합 허브</p>
+  </header>
+
+  <div class="vseg" role="group" aria-label="시안"><button type="button" data-v="a1">A-1 · 화이트 라인</button><button type="button" data-v="a2">A-2 · 소프트 글래스</button><button type="button" data-v="d1">D-1 · 화이트 리스트</button><button type="button" data-v="d2">D-2 · 소프트 패널</button></div>
+  <p class="vdesc" id="vdesc"></p>
+  <section class="brands" id="brands"></section>
+
+  <section class="tools">
+    <button type="button" class="tc" data-go="고객 통합 이력"><span class="ic" style="background:#EAF0FD;color:#3A63C8"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 18c1-2.5 3-3.5 5-3.5s4 1 5 3.5"/></svg></span>고객 통합 이력</button>
+    <button type="button" class="tc" data-go="기사 일정"><span class="ic" style="background:#E8F5EC;color:#1E8E4E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>기사 일정</button>
+    <button type="button" class="tc" data-go="시스템 관리"><span class="ic" style="background:#F0ECFC;color:#6D4FC2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.5 3.4-5 6-5"/><circle cx="17" cy="16" r="2.5"/><path d="M17 12.5v1M17 18.5v1M13.5 16h1M19.5 16h1"/></svg></span>시스템 관리</button>
+    <button type="button" class="tc" data-go="기사 앱"><span class="ic" style="background:#FDF3E2;color:#B26A00"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c.8-3.5 3.4-5 6-5s5.2 1.5 6 5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 15c1.6.6 2.7 2 3 5"/></svg></span>기사 앱</button>
+  </section>
+
+  <p class="note">회색 항목은 접근 권한이 없습니다. 업무 중에는 좌측 상단 업무 버튼으로 다른 업무로 이동할 수 있습니다.</p>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+  var t = document.getElementById('toast'), tt;
+  function toast(m){ t.textContent = m; t.hidden = false; clearTimeout(tt); tt = setTimeout(function(){ t.hidden = true; }, 2000); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-go]'), function(b){
+    b.onclick = function(e){ e.stopPropagation(); toast(b.dataset.go + ' 화면으로 이동할 자리예요'); };
+  });
+  // 탭(터치)이나 Enter로도 열고 닫기
+  Array.prototype.forEach.call(document.querySelectorAll('.bc'), function(c){
+    c.addEventListener('click', function(){ c.classList.toggle('open'); });
+    c.addEventListener('keydown', function(e){ if (e.target === c && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); c.classList.toggle('open'); } });
+  });
+})();
+
+(function(){
+  var B = [
+    { k:'ys', logo:'<span class="wm"><small>(주)</small><span><span class="y">Y</span>S COMPANY</span></span>', name:'<span class="y">Y</span>S COMPANY', label:'YS 설치',
+      m:[['오더 목록','<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>'],['재고','<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>'],['정산','<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/>']] },
+    { k:'ck', logo:'<span class="ckw">CUCKOO</span>', name:'CUCKOO', label:'쿠쿠',
+      m:[['난공사','<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>'],['일반설치','<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>'],['단납특판','<path d="M3 7h13v10H3z"/><path d="M16 10h4l1 3v4h-5"/><circle cx="7" cy="18" r="1.6"/><circle cx="18" cy="18" r="1.6"/>']] }
+  ];
+  var DESC = { a1:'흰 카드 · 로고가 올라가고 상자 없는 글자 메뉴가 나타나요 · 메뉴에 올리면 가운데서 밑줄이 그어져요',
+               a2:'흰 카드 그대로 · 빛이 한 번 스치고 로고가 올라가며 둥근 알약 메뉴가 떠올라요',
+               d1:'카드가 옆으로 넓어지며 오른쪽에 얇은 선으로 나뉜 메뉴 목록이 펼쳐져요 · 올리면 › 가 살짝 밀려요',
+               d2:'카드가 넓어지면서 오른쪽 절반에 연회색 패널이 밀려 나오고 그 안에 메뉴가 있어요' };
+  var ic = function(p, sz){ return '<svg width="' + (sz || 17) + '" height="' + (sz || 17) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; };
+  var ARROW = '<svg class="ar" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  var HINT = '<div class="hint"><i></i>MENU<i></i></div>';
+  function card(v, b){
+    var go = function(x){ return ' data-go="' + b.label + ' · ' + x[0] + '"'; };
+    if (v === 'a1' || v === 'a2') return '<div class="bc ' + b.k + ' ' + (v === 'a1' ? 'lnk' : 'lux') + '" tabindex="0" aria-label="' + b.label + ' 업무"><div class="logo">' + b.logo + '</div><span class="rule"></span>' + HINT + '<div class="menu">' + b.m.map(function(x){ return '<button type="button"' + go(x) + '>' + (v === 'a1' ? '' : ic(x[1])) + x[0] + '</button>'; }).join('') + '</div></div>';
+    if (v === 'd1') return '<div class="wc lst ' + b.k + '" tabindex="0" aria-label="' + b.label + ' 업무"><div class="logo">' + b.logo + '</div><span class="vline"></span><div class="side">' + b.m.map(function(x){ return '<button type="button"' + go(x) + '>' + ic(x[1]) + x[0] + ARROW + '</button>'; }).join('') + '</div></div>';
+    return '<div class="wc pnl ' + b.k + '" tabindex="0" aria-label="' + b.label + ' 업무"><div class="logo">' + b.logo + '</div><div class="side"><span class="cap">MENU</span>' + b.m.map(function(x){ return '<button type="button"' + go(x) + '>' + ic(x[1]) + x[0] + ARROW + '</button>'; }).join('') + '</div></div>';
+  }
+  var t = document.getElementById('toast'), tt;
+  function toast(m){ t.textContent = m; t.hidden = false; clearTimeout(tt); tt = setTimeout(function(){ t.hidden = true; }, 2000); }
+  function show(v){
+    var el = document.getElementById('brands');
+    el.className = 'brands' + (v.charAt(0) === 'd' ? ' wide' : '');
+    el.innerHTML = B.map(function(b){ return card(v, b); }).join('');
+    document.getElementById('vdesc').textContent = DESC[v];
+    Array.prototype.forEach.call(document.querySelectorAll('.vseg button'), function(b){ b.setAttribute('aria-pressed', b.dataset.v === v); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-go]'), function(b){ b.onclick = function(e){ e.stopPropagation(); toast(b.dataset.go + ' 화면으로 이동할 자리예요'); }; });
+    Array.prototype.forEach.call(el.children, function(c){
+      c.addEventListener('click', function(){ c.classList.toggle('open'); });
+      c.addEventListener('keydown', function(e){ if (e.target === c && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); c.classList.toggle('open'); } });
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.vseg button'), function(b){ b.onclick = function(){ show(b.dataset.v); }; });
+  show('a1');
+})();
+</script>
+<script>(function(){var h=location.hash.slice(1);if(!h)return;var b=document.querySelector('[data-m="'+h+'"],[data-v="'+h+'"]');if(b)b.click();document.addEventListener('click',function(){},true);})();</script></body></html>

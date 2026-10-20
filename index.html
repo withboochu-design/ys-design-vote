@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ERP 디자인 투표</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+/* 레이아웃: 시안마다 [질문 → 화면 안 미리보기 → 바로 아래 선택] · 맨 아래 의견 · 하단 고정 제출 줄 */
+:root{
+  --bg:#F3F5F7; --card:#FFFFFF; --tint:#F7F8FA; --line:#E4E7EC; --line2:#EEF0F3;
+  --ink:#1D2433; --sub:#5A6475; --mute:#99A1AD;
+  --navy:#1B2A55; --navy-t:#EDF0F8; --green:#22A447; --green-d:#1B8A3B; --red:#C2413B;
+  --f:'Noto Sans KR',system-ui,-apple-system,'Malgun Gothic',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11151C;--card:#191E28;--tint:#1F2531;--line:#2A303C;--line2:#232935;--ink:#E7EAF0;--sub:#A9B1BE;--mute:#7A8392;--navy:#9DB0EA;--navy-t:#232C42;--green:#2FB956;--green-d:#5BD07D;--red:#F08A84;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151C;--card:#191E28;--tint:#1F2531;--line:#2A303C;--line2:#232935;--ink:#E7EAF0;--sub:#A9B1BE;--mute:#7A8392;--navy:#9DB0EA;--navy-t:#232C42;--green:#2FB956;--green-d:#5BD07D;--red:#F08A84;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:14px;-webkit-font-smoothing:antialiased}
+button,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+.wrap{max-width:1280px;margin:0 auto;padding-block:40px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+.hero{text-align:center;display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.hero .eb{font-size:12px;letter-spacing:.18em;color:var(--mute)}
+.hero h1{margin:0;font-size:26px;font-weight:600;text-wrap:balance}
+.hero p{margin:0;color:var(--sub);line-height:1.7}
+
+#qs{display:flex;flex-direction:column;gap:44px}
+.q{background:var(--card);box-shadow:0 2px 10px rgba(16,24,40,.05);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.qh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.qh .qn{font-size:12px;color:var(--mute);font-weight:500}
+.qh h2{margin:0;font-size:18px;font-weight:600}
+.qh .done{margin-left:auto;font-size:12px;color:var(--green-d)}
+.qd{margin:-6px 0 0;color:var(--sub);font-size:13px;line-height:1.6}
+
+.pv{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--tint)}
+.pvbar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--sub);background:var(--card)}
+.pvbar .dot{display:flex;gap:5px}
+.pvbar .dot i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.pvbar a{margin-left:auto;color:var(--navy);text-decoration:none;padding:3px 8px;border:1px solid var(--line);border-radius:6px}
+.pvbar a:hover{border-color:var(--navy)}
+.pv iframe{display:block;width:100%;height:640px;border:0;background:#fff}
+@media (max-width:700px){.pv iframe{height:520px}}
+
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.op{position:relative;display:flex;flex-direction:column;gap:5px;padding:13px 14px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-align:left;transition:border-color .15s,box-shadow .15s,background .15s}
+.op:hover{border-color:color-mix(in srgb,var(--navy) 35%,var(--line))}
+.op[aria-checked="true"]{border-color:var(--navy);background:var(--navy-t);box-shadow:0 0 0 1px var(--navy)}
+.op .ol{font-size:11.5px;font-weight:600;color:var(--navy);letter-spacing:.04em}
+.op .ot{font-weight:500;font-size:14px}
+.op .od{font-size:12px;color:var(--sub);line-height:1.5}
+.op .rd{position:absolute;top:12px;right:12px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center}
+.op[aria-checked="true"] .rd{border-color:var(--navy);background:var(--navy)}
+.op[aria-checked="true"] .rd::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--card)}
+.sub{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
+.sub .lb{font-size:13px;font-weight:500}
+.sub .opts{grid-template-columns:repeat(2,minmax(140px,180px))}
+.sub .op{padding:10px 14px;flex-direction:row;align-items:center;gap:8px}
+.sub .op .sw{width:16px;height:16px;border-radius:4px;border:1px solid var(--line)}
+.sub .op .rd{position:static;margin-left:auto}
+
+.note{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.note label{font-weight:600;font-size:15px}
+.note label small{font-weight:400;color:var(--mute);font-size:12px;margin-left:6px}
+.note textarea{min-height:84px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);line-height:1.6}
+.note textarea:focus{outline:none;border-color:var(--navy)}
+
+.submit{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));width:min(1248px,calc(100% - 32px));display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px 12px 18px;box-shadow:0 10px 30px rgba(16,24,40,.12);z-index:5}
+.submit .pr{font-size:13px;color:var(--sub)}
+.submit .pr b{color:var(--ink);font-weight:600}
+.submit .jump{border:none;background:none;color:var(--navy);font-size:12.5px;text-decoration:underline;padding:0}
+.submit button.go{margin-left:auto;height:42px;padding:0 22px;border:none;border-radius:10px;background:var(--green);color:#fff;font-weight:600}
+.submit button.go:disabled{opacity:.45;cursor:default}
+
+.thanks{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:48px 22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.thanks .ck{width:52px;height:52px;border-radius:50%;background:color-mix(in srgb,var(--green) 14%,var(--card));color:var(--green-d);display:grid;place-items:center}
+.thanks h2{margin:0;font-size:20px;font-weight:600}
+.thanks p{margin:0;color:var(--sub);line-height:1.7}
+.thanks button{margin-top:6px;height:38px;padding:0 16px;border:1px solid var(--line);border-radius:9px;background:var(--card)}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:10px;font-size:13px;z-index:9}
+</style>
+</head>
+<body>
+<main class="wrap" id="main">
+  <header class="hero">
+    <span class="eb">YS ERP · DESIGN VOTE</span>
+    <h1>어떤 화면이 더 쓰기 편한가요?</h1>
+    <p>화면 안에서 직접 눌러 써 보고, 바로 아래에서 하나씩 골라 주세요.<br>로그인 없이 익명으로 제출돼요.</p>
+  </header>
+  <div id="qs"></div>
+  <section class="note">
+    <label for="memo">한 줄 의견 <small>선택 · 불편했던 점이나 바라는 점</small></label>
+    <textarea id="memo" maxlength="500" placeholder="예) 업무 전환 메뉴는 단추형이 빠른데 아이콘이 조금 작아요"></textarea>
+  </section>
+</main>
+<section class="wrap" id="done" hidden>
+  <div class="thanks">
+    <span class="ck"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+    <h2>제출했어요 · 고맙습니다</h2>
+    <p>골라 주신 의견은 화면을 정할 때 그대로 반영할게요.</p>
+    <button type="button" id="again">다시 고르기</button>
+  </div>
+</section>
+<div class="submit" id="bar">
+  <span class="pr" id="prog"></span>
+  <button type="button" class="jump" id="jump" hidden>안 고른 질문으로 ↓</button>
+  <button type="button" class="go" id="send" disabled>제출하기</button>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* =====================================================================
+   ① 구글 설문지 연결
+   구글 설문지 → 오른쪽 위 ⋮ → '미리 채워진 링크 가져오기' →
+   모든 칸에 아무 글자(예: x)나 넣고 [링크 가져오기] → 복사한 링크를 아래에 붙여 넣기.
+   설문 질문 순서: 1 업무 전환 메뉴 · 2 펼친 메뉴 색 · 3 업무 통합 허브 · 4 오더 목록 · 5 의견  (모두 '단답형')
+   ===================================================================== */
+var FORM_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLSfjF5Zv1PXymIn0GHHz98lKKAU53pc2NQbFyBC58V2aAoafzw/viewform?usp=pp_url&entry.1706245308=x&entry.1388438511=x&entry.1996774142=x&entry.1528715090=x&entry.1974105393=x';
+
+/* ② 질문 목록 · 시안이 늘면 여기에 추가 (f: 같은 폴더의 시안 파일) */
+var QS = [
+  { id:'menu', t:'업무 전환 메뉴', d:'왼쪽 위 "현재 업무"를 눌러 다른 업무로 바꾸는 메뉴예요. 위쪽 A · B · C 버튼으로 바꿔 보거나, 아래에서 고르면 화면이 따라 바뀌어요.', f:'menu.html',
+    o:[ ['a','A','아래로 펼침','현재 업무 아래로 목록이 펼쳐져요'], ['d','B','단추 펼침/접힘','업무가 단추로 펼쳐지고 다시 누르면 접혀요'], ['e','C','옆으로 펼침','사이드바 오른쪽으로 메뉴가 넓게 열려요'] ],
+    sub:{ id:'menuColor', t:'펼친 메뉴 색', o:[ ['0','브랜드 남색','#0F1F4B'], ['1','흰색','#FFFFFF'] ], sel:function(v){ return '[data-mc="' + v + '"]'; } } },
+  { id:'hub', t:'업무 통합 허브', d:'로그인 후 첫 화면이에요. 로고에 마우스를 올리면 메뉴가 나와요.', f:'hub.html',
+    o:[ ['a1','A-1','화이트 라인','로고가 올라가며 글자 메뉴 + 밑줄'], ['a2','A-2','소프트 글래스','빛이 스치고 둥근 알약 메뉴'], ['d1','D-1','화이트 리스트','카드가 넓어지며 오른쪽에 목록'], ['d2','D-2','소프트 패널','카드가 넓어지며 연회색 패널'] ] },
+  { id:'orders', t:'오더 목록 · 데이터가 적을 때', d:'오더가 1건뿐일 때 화면이에요. 위쪽 A · B 버튼으로 바꿔 보거나, 아래에서 고르면 화면이 따라 바뀌어요.', f:'orders.html',
+    o:[ ['fixed','A','고정 높이 + 꼬리 줄','상자 높이는 그대로, 맨 아래에 건수 · 페이지'], ['auto','B','내용 높이 + 꼬리 줄','상자가 데이터만큼만 내려와요'] ] }
+];
+
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
+  var picks = {}, busy = false;
+  var all = []; QS.forEach(function(q){ all.push(q); if (q.sub) all.push(q.sub); });
+
+  // 시안 화면 안의 버튼을 대신 눌러 미리보기를 고른 안으로 바꿈
+  function sync(fid, selector){
+    try { var d = $(fid).contentDocument, b = d && d.querySelector(selector); if (b) b.click(); } catch (e) {}
+  }
+  function optHtml(qid, o, sw){
+    var on = picks[qid] === o[0];
+    return '<div class="op" role="radio" tabindex="0" data-q="' + qid + '" data-o="' + o[0] + '" aria-checked="' + on + '">' +
+      (sw ? '<span class="sw" style="background:' + o[2] + '"></span><span class="ot">' + esc(o[1]) + '</span>'
+          : '<span class="ol">' + o[1] + '</span><span class="ot">' + esc(o[2]) + '</span><span class="od">' + esc(o[3]) + '</span>') + '<span class="rd"></span></div>';
+  }
+  function build(){
+    $('qs').innerHTML = QS.map(function(q, i){
+      return '<section class="q" id="sec-' + q.id + '"><div class="qh"><span class="qn">Q' + (i + 1) + '</span><h2 id="qt-' + q.id + '">' + esc(q.t) + '</h2><span class="done" id="dn-' + q.id + '"></span></div>' +
+        '<p class="qd">' + esc(q.d) + '</p>' +
+        '<div class="pv"><div class="pvbar"><span class="dot"><i></i><i></i><i></i></span>미리보기 · 화면 안에서 직접 눌러 보세요<a href="' + q.f + '" target="_blank" rel="noopener">새 창으로 크게 ↗</a></div>' +
+        '<iframe id="fr-' + q.id + '" src="' + q.f + '" title="' + esc(q.t) + ' 미리보기" loading="lazy"></iframe></div>' +
+        '<div class="opts" role="radiogroup" aria-labelledby="qt-' + q.id + '" id="op-' + q.id + '"></div>' +
+        (q.sub ? '<div class="sub"><span class="lb" id="qt-' + q.sub.id + '">' + esc(q.sub.t) + '</span><div class="opts" role="radiogroup" aria-labelledby="qt-' + q.sub.id + '" id="op-' + q.sub.id + '"></div></div>' : '') +
+        '</section>';
+    }).join('');
+    paint();
+  }
+  function paint(){
+    QS.forEach(function(q){
+      $('op-' + q.id).innerHTML = q.o.map(function(o){ return optHtml(q.id, o); }).join('');
+      if (q.sub) $('op-' + q.sub.id).innerHTML = q.sub.o.map(function(o){ return optHtml(q.sub.id, o, true); }).join('');
+      $('dn-' + q.id).textContent = picks[q.id] && (!q.sub || picks[q.sub.id]) ? '✓ 선택함' : '';
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.op'), function(el){
+      var go = function(){
+        var qid = el.dataset.q, v = el.dataset.o; picks[qid] = v; paint();
+        var q = QS.filter(function(x){ return x.id === qid; })[0];
+        if (q){ sync('fr-' + q.id, '[data-m="' + v + '"],[data-v="' + v + '"]'); if (q.sub && picks[q.sub.id]) sync('fr-' + q.id, q.sub.sel(picks[q.sub.id])); }
+        else { var p = QS.filter(function(x){ return x.sub && x.sub.id === qid; })[0]; if (p) sync('fr-' + p.id, p.sub.sel(v)); }
+        var nx = document.querySelector('[data-q="' + qid + '"][data-o="' + v + '"]'); if (nx) nx.focus();
+      };
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+    });
+    var n = all.filter(function(q){ return picks[q.id]; }).length;
+    $('prog').innerHTML = '<b class="num">' + n + ' / ' + all.length + '</b> 선택' + (n < all.length ? ' · 모두 고르면 제출할 수 있어요' : ' · 다 골랐어요');
+    $('jump').hidden = n === all.length || n === 0;
+    $('send').disabled = busy || n < all.length;
+  }
+  $('jump').onclick = function(){
+    var q = all.filter(function(x){ return !picks[x.id]; })[0]; if (!q) return;
+    var el = $('op-' + q.id); el.scrollIntoView({ behavior:'smooth', block:'center' }); var f = el.querySelector('.op'); if (f) setTimeout(function(){ f.focus({ preventScroll:true }); }, 400);
+  };
+
+  var tt; function toast(m){ $('toast').textContent = m; $('toast').hidden = false; clearTimeout(tt); tt = setTimeout(function(){ $('toast').hidden = true; }, 2800); }
+  function label(q, v){ var o = q.o.filter(function(x){ return x[0] === v; })[0]; return !o ? v : o.length > 3 ? o[1] + ' · ' + o[2] : o[1]; }
+
+  // 구글 설문지로 조용히 보냄 (화면 이동 없음)
+  $('send').onclick = async function(){
+    if (busy) return;
+    var ids = [], base = '';
+    try { var u = new URL(FORM_LINK); base = u.origin + u.pathname.replace(/\/viewform$/, '/formResponse'); u.searchParams.forEach(function(v, k){ if (/^entry\.\d+$/.test(k)) ids.push(k); }); } catch (e) {}
+    var vals = all.map(function(q){ return label(q, picks[q.id]); }).concat([$('memo').value.trim()]);
+    if (!base || ids.length < vals.length){ toast('설문지 연결 전이라 저장되지 않았어요 · 화면 확인용이에요'); console.log('응답(미저장):', vals); return; }
+    busy = true; paint(); $('send').textContent = '보내는 중…';
+    var body = new URLSearchParams(); vals.forEach(function(v, i){ body.append(ids[i], v); });
+    try {
+      await fetch(base, { method:'POST', mode:'no-cors', body: body });
+      try { localStorage.setItem('ysvote-done', '1'); } catch (e) {}
+      $('main').hidden = true; $('bar').hidden = true; $('done').hidden = false; window.scrollTo(0, 0);
+    } catch (e){ toast('보내지 못했어요 · 인터넷 연결을 확인하고 다시 눌러 주세요'); }
+    busy = false; $('send').textContent = '제출하기'; paint();
+  };
+  $('again').onclick = function(){ $('done').hidden = true; $('main').hidden = false; $('bar').hidden = false; };
+
+  build();
+})();
+</script>
+</body>
+</html>
