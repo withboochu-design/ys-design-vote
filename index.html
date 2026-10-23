@@ -263,9 +263,12 @@ a{color:inherit}
   function show(old){ $(&#x27;home&#x27;).hidden = old; $(&#x27;homeBody&#x27;).hidden = old; $(&#x27;fab&#x27;).hidden = old; $(&#x27;old&#x27;).hidden = !old; window.scrollTo(0, 0); }
   Array.prototype.forEach.call(document.querySelectorAll(&#x27;.topbar a, .hcta a&#x27;), function(a){ a.onclick = function(e){ e.preventDefault(); if (a.classList.contains(&#x27;track&#x27;)) show(true); else if (a.classList.contains(&#x27;logo&#x27;)) show(false); else toast(&#x27;시안에서는 진행 조회만 연결돼 있어요&#x27;); }; });
   $(&#x27;fab&#x27;).onclick = function(){ toast(&#x27;기존 화면에서는 카카오톡 채널 하나로 바로 연결돼요&#x27;); };
-  $(&#x27;fill&#x27;).onclick = function(){ $(&#x27;o1&#x27;).value = &#x27;YS-H-2610-0148&#x27;; $(&#x27;o2&#x27;).value = &#x27;010-1234-5678&#x27;; $(&#x27;f1&#x27;).requestSubmit(); };
-  $(&#x27;f1&#x27;).onsubmit = function(e){ e.preventDefault(); if (!$(&#x27;o1&#x27;).value.trim() || !$(&#x27;o2&#x27;).value.trim()){ $(&#x27;o1&#x27;).value = &#x27;YS-H-2610-0148&#x27;; $(&#x27;o2&#x27;).value = &#x27;010-1234-5678&#x27;; } $(&#x27;res&#x27;).hidden = false; $(&#x27;go1&#x27;).classList.remove(&#x27;lure&#x27;); $(&#x27;res&#x27;).scrollIntoView({ behavior:&#x27;smooth&#x27;, block:&#x27;center&#x27; }); };
+  $(&#x27;fill&#x27;).onclick = function(){ $(&#x27;o1&#x27;).value = &#x27;YS-H-2610-0148&#x27;; $(&#x27;o2&#x27;).value = &#x27;010-1234-5678&#x27;; show1(); };
+  function show1(){  if (!$(&#x27;o1&#x27;).value.trim() || !$(&#x27;o2&#x27;).value.trim()){ $(&#x27;o1&#x27;).value = &#x27;YS-H-2610-0148&#x27;; $(&#x27;o2&#x27;).value = &#x27;010-1234-5678&#x27;; } $(&#x27;res&#x27;).hidden = false; $(&#x27;go1&#x27;).classList.remove(&#x27;lure&#x27;); $(&#x27;res&#x27;).scrollIntoView({ behavior:&#x27;smooth&#x27;, block:&#x27;center&#x27; }); }
   $(&#x27;f2&#x27;).onsubmit = function(e){ e.preventDefault(); toast(&#x27;기존 화면: 견적이 등록된 경우에만 조회돼요&#x27;); };
+  $(&#x27;f1&#x27;).onsubmit = function(e){ e.preventDefault(); show1(); };
+  $(&#x27;f1&#x27;).querySelector(&#x27;.gb&#x27;).onclick = function(e){ e.preventDefault(); show1(); };
+  $(&#x27;f2&#x27;).querySelector(&#x27;.gb&#x27;).onclick = function(e){ e.preventDefault(); toast(&#x27;기존 화면: 견적이 등록된 경우에만 조회돼요&#x27;); };
   $(&#x27;toLogin&#x27;).onclick = function(e){ e.preventDefault(); show(false); };
 })();
 &lt;/script&gt;
@@ -1305,17 +1308,20 @@ body.k-open .tipb.upr{display:none}
     $(&#x27;phone&#x27;).scrollTop = 0; window.scrollTo(0, 0);
   }
   function bindSearch(){
-    each(&#x27;[data-demo]&#x27;, function(b){ b.onclick = function(){ var o = ORDERS[+b.dataset.demo]; $(&#x27;qNo&#x27;).value = o.no; $(&#x27;qPh&#x27;).value = o.ph.replace(/(\d{3})(\d{4})(\d{4})/, &#x27;$1-$2-$3&#x27;); $(&#x27;err&#x27;).hidden = true; $(&#x27;fm&#x27;).requestSubmit(); }; });
+    each(&#x27;[data-demo]&#x27;, function(b){ b.onclick = function(){ var o = ORDERS[+b.dataset.demo]; $(&#x27;qNo&#x27;).value = o.no; $(&#x27;qPh&#x27;).value = o.ph.replace(/(\d{3})(\d{4})(\d{4})/, &#x27;$1-$2-$3&#x27;); $(&#x27;err&#x27;).hidden = true; lookup(); }; });
     $(&#x27;qPh&#x27;).addEventListener(&#x27;input&#x27;, function(){ var d = digits(this.value).slice(0, 11); this.value = d.length &gt; 7 ? d.replace(/(\d{3})(\d{3,4})(\d{4})/, &#x27;$1-$2-$3&#x27;) : d.length &gt; 3 ? d.slice(0, 3) + &#x27;-&#x27; + d.slice(3) : d; });
-    $(&#x27;fm&#x27;).addEventListener(&#x27;submit&#x27;, function(e){
-      e.preventDefault();
+    $(&#x27;fm&#x27;).addEventListener(&#x27;submit&#x27;, function(e){ e.preventDefault(); lookup(); });
+    $(&#x27;fm&#x27;).querySelector(&#x27;.go&#x27;).addEventListener(&#x27;click&#x27;, function(e){ e.preventDefault(); lookup(); });
+    $(&#x27;fm&#x27;).addEventListener(&#x27;keydown&#x27;, function(e){ if (e.key === &#x27;Enter&#x27;){ e.preventDefault(); lookup(); } });
+    function lookup(){
+      if ($(&#x27;fm&#x27;).querySelector(&#x27;.go&#x27;).disabled) return;
       var no = $(&#x27;qNo&#x27;).value.trim().toUpperCase(), ph = digits($(&#x27;qPh&#x27;).value);
       if (!no || ph.length &lt; 10){ $(&#x27;err&#x27;).textContent = !no ? &#x27;오더번호 또는 쿠쿠 고객번호를 입력해 주세요&#x27; : &#x27;휴대폰 번호를 정확히 입력해 주세요&#x27;; $(&#x27;err&#x27;).hidden = false; return; }
       var i = ORDERS.findIndex(function(x){ return x.no === no &amp;&amp; x.ph === ph; });
       if (i &lt; 0){ $(&#x27;err&#x27;).textContent = &#x27;일치하는 접수 건이 없어요. 번호를 다시 확인해 주세요.&#x27;; $(&#x27;err&#x27;).hidden = false; return; }
       $(&#x27;fm&#x27;).querySelector(&#x27;.go&#x27;).disabled = true; $(&#x27;ldr&#x27;).hidden = false;
       setTimeout(function(){ S.screen = String(i); paint(); }, still ? 0 : 1100);
-    });
+    }
   }
 
   // ───── 2안 화면 ─────
@@ -2216,17 +2222,20 @@ body.k-open .tipb.upr{display:none}
     $(&#x27;phone&#x27;).scrollTop = 0; window.scrollTo(0, 0);
   }
   function bindSearch(){
-    each(&#x27;[data-demo]&#x27;, function(b){ b.onclick = function(){ var o = ORDERS[+b.dataset.demo]; $(&#x27;qNo&#x27;).value = o.no; $(&#x27;qPh&#x27;).value = o.ph.replace(/(\d{3})(\d{4})(\d{4})/, &#x27;$1-$2-$3&#x27;); $(&#x27;err&#x27;).hidden = true; $(&#x27;fm&#x27;).requestSubmit(); }; });
+    each(&#x27;[data-demo]&#x27;, function(b){ b.onclick = function(){ var o = ORDERS[+b.dataset.demo]; $(&#x27;qNo&#x27;).value = o.no; $(&#x27;qPh&#x27;).value = o.ph.replace(/(\d{3})(\d{4})(\d{4})/, &#x27;$1-$2-$3&#x27;); $(&#x27;err&#x27;).hidden = true; lookup(); }; });
     $(&#x27;qPh&#x27;).addEventListener(&#x27;input&#x27;, function(){ var d = digits(this.value).slice(0, 11); this.value = d.length &gt; 7 ? d.replace(/(\d{3})(\d{3,4})(\d{4})/, &#x27;$1-$2-$3&#x27;) : d.length &gt; 3 ? d.slice(0, 3) + &#x27;-&#x27; + d.slice(3) : d; });
-    $(&#x27;fm&#x27;).addEventListener(&#x27;submit&#x27;, function(e){
-      e.preventDefault();
+    $(&#x27;fm&#x27;).addEventListener(&#x27;submit&#x27;, function(e){ e.preventDefault(); lookup(); });
+    $(&#x27;fm&#x27;).querySelector(&#x27;.go&#x27;).addEventListener(&#x27;click&#x27;, function(e){ e.preventDefault(); lookup(); });
+    $(&#x27;fm&#x27;).addEventListener(&#x27;keydown&#x27;, function(e){ if (e.key === &#x27;Enter&#x27;){ e.preventDefault(); lookup(); } });
+    function lookup(){
+      if ($(&#x27;fm&#x27;).querySelector(&#x27;.go&#x27;).disabled) return;
       var no = $(&#x27;qNo&#x27;).value.trim().toUpperCase(), ph = digits($(&#x27;qPh&#x27;).value);
       if (!no || ph.length &lt; 10){ $(&#x27;err&#x27;).textContent = !no ? &#x27;오더번호 또는 쿠쿠 고객번호를 입력해 주세요&#x27; : &#x27;휴대폰 번호를 정확히 입력해 주세요&#x27;; $(&#x27;err&#x27;).hidden = false; return; }
       var i = ORDERS.findIndex(function(x){ return x.no === no &amp;&amp; x.ph === ph; });
       if (i &lt; 0){ $(&#x27;err&#x27;).textContent = &#x27;일치하는 접수 건이 없어요. 번호를 다시 확인해 주세요.&#x27;; $(&#x27;err&#x27;).hidden = false; return; }
       $(&#x27;fm&#x27;).querySelector(&#x27;.go&#x27;).disabled = true; $(&#x27;ldr&#x27;).hidden = false;
       setTimeout(function(){ S.screen = String(i); paint(); }, still ? 0 : 1100);
-    });
+    }
   }
   function bindResult(o){
     if ($(&#x27;wmk&#x27;)) $(&#x27;wmk&#x27;).style.backgroundImage = watermark(o);
